@@ -1,6 +1,6 @@
 # Klipper LED State
 
-**Klipper LED State** is a simple project to create a beautiful, customizable **LED status bar for 3D printers**, inspired by H2D, showing printer status, current print progress, bed temperature, and lighting effects like **breath** and **wave**.  
+**Klipper LED State** is a simple project for creating a beautiful and customizable **LED status bar for a Klipper-controlled 3D printer**, inspired by H2D. It displays the printer status, print progress, bed temperature, and lighting effects such as **breath** and **wave**.
 
 The project works **out-of-the-box**, with **no changes required to the printer configuration**. All effects and LED control are processed on a **low-cost ESP32 board**, ensuring **minimal implementation cost**. Firmware receives printer status over **Wi-Fi** via **WebSocket** (supports Klipper/Moonraker).  
 
@@ -148,7 +148,7 @@ MIT License — free use, modification, and redistribution
 
 # Klipper LED State (Русский перевод)
 
-**Klipper LED State** — это проект для создания красивой настраиваемой **LED-статусной строки для 3D-принтера**, вдохновлённая H2D. Она отображает статус принтера, процесс печати, температуру стола и эффекты свечения: **breath** и **wave**.  
+**Klipper LED State** — это простой проект для создания красивой настраиваемой **LED-статусной строки для 3D-принтера, управляемого Klipper**, вдохновлённой H2D. Она отображает статус принтера, процесс печати, температуру стола и эффекты свечения: **breath** и **wave**.
 
 Проект **работает «из коробки»**, без изменения конфигурации принтера. Вся обработка эффектов выполняется на **дешёвой плате ESP32**, что делает реализацию **недорогой**. Прошивка получает статус принтера по **Wi-Fi** через **WebSocket**.  
 
