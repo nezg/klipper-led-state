@@ -52,7 +52,7 @@ static void handleRoot() {
   bool online = printer_moonraker_isOnline();//printer_isOnline();
 
   if (!online) {
-    String ip = prefGetString("printer", "ip", "");
+    String ip = prefGetString("printer", "ip", "192.168.4.1");
 
     String pageIP = FPSTR(PRINTER_IP_PAGE);
 
@@ -287,7 +287,6 @@ static void handleSaveWifi() {
     return;
   }
 
-  // Попытка подключения временно (не сохраняем в prefs пока не подтвердится)
   wifi_connectTemp(ssid, pass);
 
   server.send(200, "application/json", "{\"status\":\"connecting\"}");
@@ -375,20 +374,23 @@ static void handleFactoryReset() {
 #include "freertos/task.h"
 #include <string.h>
 
+struct CpuSnapshot {
+    uint32_t totalRunTime;
+    float idleTimes[2];
+};
+
+static CpuSnapshot prev = {0, {0,0}};
+
 static void handleCPU() {
     const UBaseType_t maxTasks = 32;
     TaskStatus_t taskStatus[maxTasks];
     uint32_t totalRunTime = 0;
 
-    // Получаем состояние всех задач и общее время
     UBaseType_t taskCount = uxTaskGetSystemState(taskStatus, maxTasks, &totalRunTime);
 
-    // Для хранения суммарного времени IDLE по ядрам
-    float idleTimes[2] = {0, 0};  // Поддержка до 2 ядер
+    float idleTimes[2] = {0,0};
     int coresFound = 0;
-
     for (UBaseType_t i = 0; i < taskCount; i++) {
-        // На ESP32 задачи IDLE называются "IDLE" или "IDLE0"/"IDLE1"
         if (strstr(taskStatus[i].pcTaskName, "IDLE") != nullptr) {
             if (taskStatus[i].xCoreID < 2) {
                 idleTimes[taskStatus[i].xCoreID] = (float)taskStatus[i].ulRunTimeCounter;
@@ -397,15 +399,22 @@ static void handleCPU() {
         }
     }
 
-    // Вычисляем загрузку для каждого ядра
-    float cpuLoad[2] = {0, 0};
-    if (totalRunTime > 0) {
+    float cpuLoad[2] = {0,0};
+    if (prev.totalRunTime > 0 && totalRunTime > prev.totalRunTime) {
+        uint32_t deltaTotal = totalRunTime - prev.totalRunTime;
         for (int c = 0; c < coresFound; c++) {
-            cpuLoad[c] = 100.0f * (1.0f - idleTimes[c] / (float)totalRunTime);
+            float deltaIdle = idleTimes[c] - prev.idleTimes[c];
+            cpuLoad[c] = 100.0f * (1.0f - deltaIdle / deltaTotal);
+            if (cpuLoad[c] < 0) cpuLoad[c] = 0;
+            else if (cpuLoad[c] > 100) cpuLoad[c] = 100;
         }
     }
 
-    // Формируем JSON с отдельной загрузкой по ядрам
+    // Сохраняем текущий снимок
+    prev.totalRunTime = totalRunTime;
+    for (int c = 0; c < 2; c++) prev.idleTimes[c] = idleTimes[c];
+
+    // Формируем JSON
     char json[128];
     if (coresFound == 2) {
         snprintf(json, sizeof(json), "{\"core0\":%.1f, \"core1\":%.1f}", cpuLoad[0], cpuLoad[1]);

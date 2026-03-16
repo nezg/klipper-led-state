@@ -105,7 +105,6 @@ int wifi_scanNetworksBlocking() {
   return WiFi.scanNetworks();
 }
 
-//ИСПРАВИТЬ?, БЛОКИРУЕТ ВЫЗОВ если пароль от текущей сети изменился
 void wifi_update() {
   if (state == WIFI_CONNECTING) {
     if (WiFi.status() == WL_CONNECTED) {

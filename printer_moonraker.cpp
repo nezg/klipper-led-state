@@ -77,7 +77,6 @@ static void wsEvent(WStype_t type, uint8_t * payload, size_t length)
         {
             Serial.println("Moonraker WS connected");
 
-            // Подписка на нужные объекты
             const char* subscribeMsg =
             "{"
             "  \"jsonrpc\": \"2.0\","
@@ -94,7 +93,6 @@ static void wsEvent(WStype_t type, uint8_t * payload, size_t length)
             "}";
             ws.sendTXT(subscribeMsg);
 
-            // Сразу запросить начальные значения.
             printer_moonraker_requestUpdate();
 
             lastWsEvent = millis();
@@ -123,7 +121,7 @@ static void wsEvent(WStype_t type, uint8_t * payload, size_t length)
 void printer_moonraker_start()
 {
     prefs.begin("printer", true);
-    String ip = prefs.getString("ip", "");
+    String ip = prefs.getString("ip", "192.168.4.2");
     prefs.end();
 
     if (ip.length() == 0) return;
@@ -165,7 +163,7 @@ void printer_moonraker_loop()
         if (ws.isConnected()) {
             if (!itTimeoutRequest) {
                 itTimeoutRequest = true;
-                printer_moonraker_requestUpdate(); //пытаемся принудительно обновить
+                printer_moonraker_requestUpdate(); 
             } else {
                 ws.disconnect(); //force disconnect.  
                 cachedOnline = false;

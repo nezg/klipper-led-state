@@ -338,7 +338,6 @@ void FastLedController::loadConfig() {
   _breath_amp_percent = prefs.getUChar("amp_percent", 50); // default 50%
   prefs.end();
 
-// вычисляем амплитуду в 0..255
 _breath_amp = (_breath_amp_percent * 255) / 100;
 
   prefs.begin("effects", true);
