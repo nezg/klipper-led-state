@@ -1,2 +1,2 @@
 # klipper-led-state
-LED status controller for Klipper printers with Moonraker integration
+Klipper LED status controller for ESP32 with Moonraker integration
