@@ -1,0 +1,16 @@
+# build artifacts
+build/
+*.bin
+*.elf
+*.map
+
+# Arduino temporary files
+*.tmp
+*.bak
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
