@@ -92,7 +92,7 @@ GPIOXX → Data In (GPIO04, GPIO05, GPIO01, GPIO02 supported, configurable in fi
 
 After flashing, ESP32 creates a Wi-Fi hotspot:  
 
-**ESP_Klipper_State**  
+**Klipper_State_LED_Config**  
 Password: `12345678`  
 
 1. Connect from your phone or computer  
@@ -201,7 +201,7 @@ MIT License — free use, modification, and redistribution
 
 ### Настройка Wi-Fi
 
-Точка доступа: **ESP_Klipper_State**, пароль `12345678`  
+Точка доступа: **Klipper_State_LED_Config**, пароль `12345678`  
 Подключиться, перейти на 192.168.4.1, указать Wi-Fi или оставить точку доступа, IP принтера в Printer Settings.  
 
 ### Настройка ленты
