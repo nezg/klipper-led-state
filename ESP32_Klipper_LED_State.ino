@@ -25,15 +25,19 @@ void setup() {
   delay(200);
 
   led.begin();
+  
+  loadPrinterConfig(); //load IP from prefs
 
-  printer_moonraker_start();
+  //printer_moonraker_start();
   Serial.println("Setup done");
 }
 
 void loop() {
   wifi_update();
   web_handle();
+  moonraker_watchdog();
   printer_moonraker_loop();
+
   unsigned long now = millis();
   if (now - lastUpdateLed >= updateIntervalLed) {
     PrinterStatus tmp;

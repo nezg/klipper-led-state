@@ -163,13 +163,9 @@ static void handleSavePrint() {
   }
 
   String ip = server.arg("ip");
-
-  prefs.begin("printer", false);
-  prefs.putString("ip", ip);
-  prefs.end();
-
-  // restart moonraker width new ip
-  printer_moonraker_restart();
+    
+  updatePrinterIP(ip.c_str());
+  
 
   server.sendHeader("Location", "/", true);
   server.send(302, "text/plain", "");

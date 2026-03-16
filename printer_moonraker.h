@@ -7,6 +7,12 @@
 extern Preferences prefs;
 #include "printer_status.h"
 
+void updatePrinterIP(const char* newIP);
+void loadPrinterConfig();
+
+bool checkPortAsync(const char* host, uint16_t port);
+void moonraker_watchdog();
+
 void printer_moonraker_start();
 void printer_moonraker_stop();
 void printer_moonraker_restart();
