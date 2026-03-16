@@ -1,0 +1,10 @@
+{
+  "additionalFiles": "..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..,..\\..",
+  "builtInLibrariesFolders": "C:\\Users\\Vladimir\\AppData\\Local\\Arduino15\\libraries",
+  "compiler.optimization_flags": "-Os",
+  "customBuildProperties": "",
+  "fqbn": "esp32:esp32:esp32c3:UploadSpeed=921600,CDCOnBoot=default,CPUFreq=160,FlashFreq=80,FlashMode=qio,FlashSize=4M,PartitionScheme=default,DebugLevel=none,EraseFlash=none,JTAGAdapter=default,ZigbeeMode=default",
+  "hardwareFolders": "C:\\Users\\Vladimir\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\3.3.7,C:\\Users\\Vladimir\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\3.3.7",
+  "otherLibrariesFolders": "c:\\Users\\Vladimir\\Desktop\\Arduino\\libraries",
+  "sketchLocation": "C:\\Users\\Vladimir\\Desktop\\Arduino\\ESP32_Klipper_LED_State"
+}
