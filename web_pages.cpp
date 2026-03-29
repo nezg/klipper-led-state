@@ -195,6 +195,9 @@ document.addEventListener('DOMContentLoaded', () => {
   <label>Error color:</label>
   <input type="color" style="width:50px;height:30px;border:none;" name="error_color" id="error_color" value="{{error_color}}">
   <span id="error_color_preview"></span>Wave effect: <input type="checkbox" name="error_wave_effect" id="error_wave_effect" {{error_wave_effect_checked}}><br>
+  <label>Offline color:</label>
+  <input type="color" style="width:50px;height:30px;border:none;" name="offline_color" id="offline_color" value="{{offline_color}}">
+  <span id="offline_color_preview"></span>Wave effect: <input type="checkbox" name="offline_wave_effect" id="offline_wave_effect" {{offline_wave_effect_checked}}><br>
   <label>Complete color:</label>
   <input type="color" style="width:50px;height:30px;border:none;" name="complete_color" id="complete_color" value="{{complete_color}}">
   <span id="complete_color_preview"></span>Wave effect: <input type="checkbox" name="complete_wave_effect" id="complete_wave_effect" {{complete_wave_effect_checked}}>&nbsp;&nbsp;&nbsp;Bed temp color on complete:<input type="checkbox" name="bed_temp_color_co" id="bed_temp_color_co" {{bed_temp_color_co_checked}}><br>

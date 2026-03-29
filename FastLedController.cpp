@@ -147,7 +147,8 @@ void FastLedController::update(const PrinterStatus& status) {
     bool isComplete = (baseColor == completeColor);
     bool isPause = (baseColor == pauseColor);
     bool isError = (baseColor == errorColor);
-    bool useWave = (isComplete && (_complete_wave_effect > 0)) || (isPause && (_pause_wave_effect > 0)) || (isError && (_error_wave_effect > 0));
+    bool isOffline = (baseColor == offlineColor);
+    bool useWave = (isComplete && (_complete_wave_effect > 0)) || (isPause && (_pause_wave_effect > 0)) || (isError && (_error_wave_effect > 0)) || (isOffline && (_offline_wave_effect > 0));
 
     bool useBedTemp = (isStandby && (_bed_temp_color_st > 0)) || (isComplete && (_bed_temp_color_co > 0));
 
@@ -326,9 +327,10 @@ void FastLedController::loadConfig() {
   _brightness_percent = prefs.getUChar("brightness", 50);
   standbyColor  = parseColor(prefs.getString("standby_color", "#FFFFFF"));
   printColor    = parseColor(prefs.getString("print_color",   "#529dff"));
-  printColor2    = parseColor(prefs.getString("print_color2",   "#000000"));
+  printColor2   = parseColor(prefs.getString("print_color2",   "#000000"));
   pauseColor    = parseColor(prefs.getString("pause_color",   "#ffe438"));
   errorColor    = parseColor(prefs.getString("error_color",   "#fe1010"));
+  offlineColor  = parseColor(prefs.getString("offline_color",   "#fe1010"));
   completeColor = parseColor(prefs.getString("complete_color","#24ff5b"));
   prefs.end();
 
@@ -347,6 +349,7 @@ _breath_amp = (_breath_amp_percent * 255) / 100;
   _print_center_start = prefs.getUChar("prt_center_st", 0);
   _pause_wave_effect = prefs.getUChar("pause_wave_ef", 0);
   _error_wave_effect = prefs.getUChar("error_wave_ef", 0);
+  _offline_wave_effect = prefs.getUChar("off_wave_ef", 0);
   _complete_wave_effect = prefs.getUChar("compl_wave_ef", 0);
   prefs.end();
 
@@ -379,7 +382,8 @@ CRGB FastLedController::colorForState(const char *state) {
   if (!state) return CRGB::Black;
   String st = toLower(state);
 
-  if (st.indexOf("error") >= 0 || st.indexOf("fail") >= 0 || st.indexOf("offline") >= 0 || st.indexOf("cancelled") >= 0) return errorColor;
+  if (st.indexOf("offline") >= 0) return offlineColor;
+  if (st.indexOf("error") >= 0 || st.indexOf("fail") >= 0 || st.indexOf("cancelled") >= 0) return errorColor;
   if (st.indexOf("print") >= 0 || st.indexOf("printing") >= 0 || st.indexOf("pnt") >= 0) return printColor;
   if (st.indexOf("pause") >= 0 || st.indexOf("paused") >= 0) return pauseColor;
   if (st.indexOf("complete") >= 0 || st.indexOf("done") >= 0) return completeColor;

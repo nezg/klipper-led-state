@@ -18,7 +18,7 @@ unsigned long lastUpdateLed = 0;
 void setup() {
   Serial.begin(115200);
   delay(10);
-  Serial.println("Setup start");
+  //Serial.println("Setup start");
 
   wifi_init();
   web_init();
@@ -29,7 +29,7 @@ void setup() {
   loadPrinterConfig(); //load IP from prefs
 
   //printer_moonraker_start();
-  Serial.println("Setup done");
+  //Serial.println("Setup done");
 }
 
 void loop() {

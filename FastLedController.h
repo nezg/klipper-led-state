@@ -54,6 +54,7 @@ private:
   CRGB printColor2    = CRGB::Black;
   CRGB pauseColor     = CRGB::Yellow;
   CRGB errorColor     = CRGB::Red;
+  CRGB offlineColor   = CRGB::Red;
   CRGB completeColor  = CRGB::Green;
 
   uint8_t _bed_temp_color_st = 0;
@@ -61,6 +62,7 @@ private:
   uint8_t _print_center_start = 0;
   uint8_t _pause_wave_effect = 0;
   uint8_t _error_wave_effect = 0;
+  uint8_t _offline_wave_effect = 0;
   uint8_t _complete_wave_effect = 0;
   uint8_t _tempColorZonePercent = 10;
 

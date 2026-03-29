@@ -69,6 +69,7 @@ static void handleRoot() {
   String print_color2 = prefGetString("color", "print_color2", "#000000");
   String pause_color = prefGetString("color", "pause_color", "#ffe438");
   String error_color = prefGetString("color", "error_color", "#fe1010");
+  String offline_color = prefGetString("color", "offline_color", "#fe1010");
   String complete_color = prefGetString("color", "complete_color", "#24ff5b");
 
   uint8_t bed_temp_color_st = prefGetInt("effects", "bed_temp_c_st", 0);
@@ -77,6 +78,7 @@ static void handleRoot() {
   uint8_t print_center_start = prefGetInt("effects", "prt_center_st", 0);
   uint8_t pause_wave_effect = prefGetInt("effects", "pause_wave_ef", 0);
   uint8_t error_wave_effect = prefGetInt("effects", "error_wave_ef", 0);
+  uint8_t offline_wave_effect = prefGetInt("effects", "off_wave_ef", 0);
   uint8_t complete_wave_effect = prefGetInt("effects", "compl_wave_ef", 0);
 
   uint16_t breath_period_ms = prefGetInt16("breath", "period_ms", 2000);
@@ -88,6 +90,7 @@ static void handleRoot() {
   pageMain.replace("{{print_color2}}", print_color2);
   pageMain.replace("{{pause_color}}", pause_color);
   pageMain.replace("{{error_color}}", error_color);
+  pageMain.replace("{{offline_color}}", offline_color);
   pageMain.replace("{{complete_color}}", complete_color);
 
   pageMain.replace("{{bed_temp_color_st_checked}}", (bed_temp_color_st > 0) ? "checked" : "");
@@ -96,6 +99,7 @@ static void handleRoot() {
   pageMain.replace("{{print_center_start_checked}}", (print_center_start > 0) ? "checked" : "");
   pageMain.replace("{{pause_wave_effect_checked}}", (pause_wave_effect > 0) ? "checked" : "");
   pageMain.replace("{{error_wave_effect_checked}}", (error_wave_effect > 0) ? "checked" : "");
+  pageMain.replace("{{offline_wave_effect_checked}}", (offline_wave_effect > 0) ? "checked" : "");
   pageMain.replace("{{complete_wave_effect_checked}}", (complete_wave_effect > 0) ? "checked" : "");
 
 
@@ -195,6 +199,7 @@ static void handleSaveColor() {
   String print_color2 = server.arg("print_color2");
   String pause_color = server.arg("pause_color");
   String error_color = server.arg("error_color");
+  String offline_color = server.arg("offline_color");
   String complete_color = server.arg("complete_color");
 
   uint8_t bed_temp_color_st = server.hasArg("bed_temp_color_st") ? 1 : 0;
@@ -203,6 +208,7 @@ static void handleSaveColor() {
   uint8_t print_center_start = server.hasArg("print_center_start") ? 1 : 0;
   uint8_t pause_wave_effect = server.hasArg("pause_wave_effect") ? 1 : 0;
   uint8_t error_wave_effect = server.hasArg("error_wave_effect") ? 1 : 0;
+  uint8_t offline_wave_effect = server.hasArg("offline_wave_effect") ? 1 : 0;
   uint8_t complete_wave_effect = server.hasArg("complete_wave_effect") ? 1 : 0;
 
   prefs.begin("color", false);
@@ -212,6 +218,7 @@ static void handleSaveColor() {
   prefs.putString("print_color2", print_color2);
   prefs.putString("pause_color", pause_color);
   prefs.putString("error_color", error_color);
+  prefs.putString("offline_color", offline_color);
   prefs.putString("complete_color", complete_color);
   prefs.end();
 
@@ -222,6 +229,7 @@ static void handleSaveColor() {
   prefs.putUChar("prt_center_st", print_center_start);
   prefs.putUChar("pause_wave_ef", pause_wave_effect);
   prefs.putUChar("error_wave_ef", error_wave_effect);
+  prefs.putUChar("off_wave_ef", offline_wave_effect);
   prefs.putUChar("compl_wave_ef", complete_wave_effect);
   prefs.end();
 
