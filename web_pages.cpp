@@ -30,14 +30,11 @@ async function updatePrinterStatus(){
         console.error(e);
     }
 }
-
 async function updateCPUStatus(){
     try {
         const r = await fetch('/cpu');
         if (!r.ok) return;
         const d = await r.json();
-
-        // Поддержка одного или двух ядер
         if (d.core0 !== undefined) document.getElementById('cpu0').innerText = d.core0.toFixed(1) + ' %';
         if (d.core1 !== undefined) document.getElementById('cpu1').innerText = d.core1.toFixed(1) + ' %';
     } catch(e) {
@@ -51,7 +48,6 @@ window.addEventListener('DOMContentLoaded', () => {
     setInterval(updateCPUStatus, 500);
 });
 </script>
-
 <h2>Printer State:</h2>
 <label>State: </label><span id="state">--</span><br><br>
 <label>Progress: </label><span id="progress">0 %</span><br><br>
@@ -67,20 +63,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const colorInputs = document.querySelectorAll('input[type="color"]');
   const brightnessSlider = document.getElementById('brightness');
-  const brightnessValue = document.getElementById('brightness_value'); //
+  const brightnessValue = document.getElementById('brightness_value');
   const ColorZonePercentSlider = document.getElementById('tempColorZonePercent');
-  const ColorZonePercentValue = document.getElementById('tempColorZonePercent_value'); //
+  const ColorZonePercentValue = document.getElementById('tempColorZonePercent_value');
   const standbyColor = document.getElementById('standby_color');
   const completeColor = document.getElementById('complete_color');
   const bedTempCheckbox_st = document.getElementById('bed_temp_color_st');
   const bedTempCheckbox_co = document.getElementById('bed_temp_color_co');
-
   const breathPeriod = document.getElementById('breath_period_ms');
   const breathAmp = document.getElementById('breath_amp_percent');
-
+  const RainbowSpeed = document.getElementById('rainbow_speed');
   let previewTimer;
   let lastColorForPreview = standbyColor.value;
-
   function clampInput(input, min, max) {
     let v = parseInt(input.value);
     if (isNaN(v)) v = min;
@@ -88,19 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (v > max) v = max;
     input.value = v;
   }
-
   function sendPreview(colorHex, e) {
     color = colorHex.replace("#", "");
     const brightness = brightnessSlider.value;
     const period = breathPeriod.value;
     const amp = breathAmp.value;
-
     let tempzone = 0;
-
     if (e) {
-        // определяем по id вызвавшего элемента
         const id = e.target.id;
-
         if (id === 'standby_color') {
             color = standbyColor.value.replace("#", "");
             if (bedTempCheckbox_st.checked) {
@@ -113,18 +102,15 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
     }
-
-    fetch(`/preview?color=${color}&brightness=${brightness}&period=${period}&amp=${amp}&tempzone=${tempzone}`)
-        .catch(err => console.log("Preview error:", err));
-}
-
+  fetch(`/preview?color=${color}&brightness=${brightness}&period=${period}&amp=${amp}&tempzone=${tempzone}`)
+      .catch(err => console.log("Preview error:", err));
+  }
   bedTempCheckbox_st.addEventListener('change', () => {
     debouncePreview(lastColorForPreview, { target: standbyColor });
   });
   bedTempCheckbox_co.addEventListener('change', () => {
     debouncePreview(lastColorForPreview, { target: completeColor });
   });
-
   function debouncePreview(colorHex, e) {
     clearTimeout(previewTimer);
     previewTimer = setTimeout(() => {
@@ -134,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
       sendPreview(colorHex, e);
     }, 500);
   }
-
   function updateColorPreview(e) {
     const preview = document.getElementById(e.target.id + '_preview');
     if (preview) preview.style.background = e.target.value;
@@ -142,35 +127,29 @@ document.addEventListener('DOMContentLoaded', () => {
     lastColorForPreview = e.target.value;
     debouncePreview(lastColorForPreview, e);
   }
-
   colorInputs.forEach(input => {
     input.addEventListener('input', updateColorPreview);
 
     const preview = document.getElementById(input.id + '_preview');
     if (preview) preview.style.background = input.value;
   });
-
   brightnessSlider.addEventListener('input', (e) => {
     brightnessValue.innerText = e.target.value + ' %';
     debouncePreview(lastColorForPreview);
   });
-
   ColorZonePercentSlider.addEventListener('input', (e) => {
     ColorZonePercentValue.innerText = e.target.value + ' %';
     debouncePreview(lastColorForPreview, { target: standbyColor });
   });
-
   breathPeriod.addEventListener('input', () => {
     debouncePreview(lastColorForPreview);
   });
-
   breathAmp.addEventListener('input', () => {
     debouncePreview(lastColorForPreview);
   });
-
   breathPeriod.addEventListener('change', () => clampInput(breathPeriod, 50, 10000));
+  RainbowSpeed.addEventListener('change', () => clampInput(breathPeriod, 50, 10000));
   breathAmp.addEventListener('change', () => clampInput(breathAmp, 0, 100));
-
   brightnessValue.innerText = brightnessSlider.value + ' %';
 });
 </script>
@@ -197,7 +176,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <span id="error_color_preview"></span>Wave effect: <input type="checkbox" name="error_wave_effect" id="error_wave_effect" {{error_wave_effect_checked}}><br>
   <label>Offline color:</label>
   <input type="color" style="width:50px;height:30px;border:none;" name="offline_color" id="offline_color" value="{{offline_color}}">
-  <span id="offline_color_preview"></span>Wave effect: <input type="checkbox" name="offline_wave_effect" id="offline_wave_effect" {{offline_wave_effect_checked}}><br>
+  <span id="offline_color_preview"></span>Wave effect: <input type="checkbox" name="offline_wave_effect" id="offline_wave_effect" {{offline_wave_effect_checked}}>&nbsp;&nbsp;&nbsp;Rainbow dot effect:<input type="checkbox" name="offline_rainbow" id="offline_rainbow" {{offline_rainbow_checked}}>&nbsp;&nbsp;&nbsp;Speed (ms):<input type="number" name="rainbow_speed" id="rainbow_speed" value="{{rainbow_speed}}"><br><br>
   <label>Complete color:</label>
   <input type="color" style="width:50px;height:30px;border:none;" name="complete_color" id="complete_color" value="{{complete_color}}">
   <span id="complete_color_preview"></span>Wave effect: <input type="checkbox" name="complete_wave_effect" id="complete_wave_effect" {{complete_wave_effect_checked}}>&nbsp;&nbsp;&nbsp;Bed temp color on complete:<input type="checkbox" name="bed_temp_color_co" id="bed_temp_color_co" {{bed_temp_color_co_checked}}><br>
@@ -217,13 +196,10 @@ const char MAIN_PAGE_BOTTOM[] PROGMEM = R"rawliteral(
   </body>
   </html> 
 )rawliteral";
-
-
 // ===================================================================================================================================================
 const char LED_CONFIG_PAGE[] PROGMEM = R"rawliteral(
 <h2>LED Config:</h2>
 <form method="POST" action="/saveLed">
-
 <label>LED Data Pin:</label>
 <select name="led_pin" id="led_pin">
   <option value="4"  {{4_SELECTED}}>GPIO4</option>
@@ -231,7 +207,6 @@ const char LED_CONFIG_PAGE[] PROGMEM = R"rawliteral(
   <option value="1"  {{1_SELECTED}}>GPIO1</option>
   <option value="2"  {{2_SELECTED}}>GPIO2</option>
 </select><br><br>
-
 <label>LED Type:</label>
 <select name="led_type" id="led_type">
   <option value="WS2812B" {{WS2812B_SELECTED}}>WS2812B</option>
@@ -239,7 +214,6 @@ const char LED_CONFIG_PAGE[] PROGMEM = R"rawliteral(
   <option value="WS2813" {{WS2813_SELECTED}}>WS2813</option>
   <option value="SK6812" {{SK6812_SELECTED}}>SK6812</option>
 </select><br><br>
-
 <label>LED Color Order:</label>
 <select name="led_type_color" id="led_type_color">
   <option value="GRB" {{GRB_SELECTED}}>GRB</option>
@@ -247,30 +221,23 @@ const char LED_CONFIG_PAGE[] PROGMEM = R"rawliteral(
   <option value="BGR" {{BGR_SELECTED}}>BGR</option>
   <option value="RBG" {{RBG_SELECTED}}>RBG</option>
 </select><br><br>
-
 <label>LED Count:</label>
 <input type="number" name="led_count" id="led_count" value="{{led_count}}"><br><br>
-
 <label>LED Right to Left:</label>
 <input type="checkbox" name="led_right" id="led_right" {{led_right_checked}}><br><br>
-
 <label>MAX Current:</label> <span id="led_current">0.4</span> A<br><br>
-
 <input type="submit" value="Save LED Config (Reboot)">
 <hr>
 </form>
-
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const ledCount = document.getElementById('led_count');
   const currentLabel = document.getElementById('led_current');
-
   function updateCurrent() {
     const count = parseInt(ledCount.value) || 0;
     const amp = 0.4 + (count * 0.033);
     currentLabel.innerText = amp.toFixed(2);
   }
-
   ledCount.addEventListener('input', updateCurrent);
   updateCurrent();
 });
@@ -286,13 +253,10 @@ const char PRINTER_IP_PAGE[] PROGMEM = R"rawliteral(
 </form><br>
 <hr>
 )rawliteral";
-
 // ============================================================================================================================================================
 const char WIFI_PAGE[] PROGMEM = R"rawliteral(
 <script>
-
 let pollTimer = null;
-
 async function scanNetworks(){
   try {
     const r = await fetch('/scan');
@@ -300,7 +264,6 @@ async function scanNetworks(){
     const list = await r.json();
     const sel = document.getElementById('ssid_select');
     sel.innerHTML = '';
-
     list.forEach(item=>{
       const opt = document.createElement('option');
       opt.value = item.ssid;
@@ -311,24 +274,17 @@ async function scanNetworks(){
     console.error(e);
   }
 }
-
 async function enableAP(){
-
   const statusDiv = document.getElementById('status');
   statusDiv.innerText = "Switching to AP mode...";
-
   try{
-
     const r = await fetch('/enable_ap',{method:'POST'});
     const data = await r.json();
-
     statusDiv.innerText = "AP Mode active. IP: " + data.ip;
-
   }catch(e){
     console.error(e);
   }
 }
-
 async function checkWifiStatus(){
   const apMode = document.getElementById('AP_mode');
   try {
@@ -343,7 +299,6 @@ async function checkWifiStatus(){
     }else if (data.status === "connected") {
       statusDiv.innerText = "Connected! Redirecting to " + data.ip;
       clearInterval(pollTimer);
-
       setTimeout(()=>{
         window.location = "http://" + data.ip;
       }, 1000);
@@ -352,68 +307,49 @@ async function checkWifiStatus(){
       statusDiv.innerText = "Connection failed. Check password.";
       clearInterval(pollTimer);
     }
-
   } catch(e){
     console.error(e);
   }
 }
-
 async function submitWifiForm(event){
   event.preventDefault();
-
   const form = document.getElementById('wifiForm');
   const formData = new FormData(form);
-
   const statusDiv = document.getElementById('status');
   statusDiv.innerText = "Starting connection...";
-
   try {
     const r = await fetch('/saveWifi', {
       method: 'POST',
       body: new URLSearchParams(formData)
     });
-
     if (!r.ok) {
       statusDiv.innerText = "Error starting connection";
       return;
     }
-
-    // начинаем polling
     pollTimer = setInterval(checkWifiStatus, 1000);
-
   } catch(e){
     statusDiv.innerText = "Request failed";
     console.error(e);
   }
 }
-
 window.addEventListener('DOMContentLoaded', () => {
   const ssidSelect = document.getElementById('ssid_select');
-  //scanNetworks();
   document.getElementById('wifiForm')
            .addEventListener('submit', submitWifiForm);
 });
-
 </script>
-
 <h2>WiFi Settings</h2>
-
 <form id="wifiForm">
   <label>SSID:</label>
   <select id="ssid_select" name="ssid"></select>
   <button type="button" onclick="scanNetworks()">Scan</button>
   <br>
-
   <label>Password:</label>
   <input name="pass" type="password"><br><br>
-
-
   <input type="submit" value="Connect"><button type="button" onclick="enableAP()">Stay in AP Mode</button>
 </form>
-
 <br>
 <div id="status" style="color:green;"></div>
-
 )rawliteral";
 // ============================================================================================================================================================
 const char REBOOT_PAGE[] PROGMEM = R"rawliteral(
@@ -438,53 +374,39 @@ setTimeout(function(){
 // ============================================================================================================================================================
 const char OTA_PAGE[] PROGMEM = R"rawliteral(
 <hr>
-
 <h2>Factory Reset</h2>
 <button type="button" onclick="factoryReset()">Factory Reset and Reboot</button>
-
 <hr>
 <h2>Firmware Update</h2>
 <form method="POST" action="/update" enctype="multipart/form-data">
   <input type="file" name="update">
   <input type="submit" value="Update Firmware">
 </form>
-
 <br>
 <div id="status"></div>
-
 <script>
 async function factoryReset(){
-
   if(!confirm("Reset all settings and reboot?"))
       return;
-
   if(!confirm("This will erase all settings. Continue?"))
     return;
-
   const status = document.getElementById("status");
   status.innerText = "Resetting device...";
-
   try{
-
     const r = await fetch('/reset', {method:'POST'});
-
     if(!r.ok){
         status.innerText = "Reset failed";
         return;
     }
-
     status.innerText = "Device rebooting...";
-
   }catch(e){
     status.innerText = "Request failed";
   }
 }
-
 const form = document.querySelector('form');
 form.addEventListener('submit', function(e){
   document.getElementById("status").innerText = "Uploading...";
 });
 </script>
-
 <hr>
 )rawliteral";

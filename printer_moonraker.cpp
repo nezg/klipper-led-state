@@ -242,10 +242,10 @@ void printer_moonraker_stop()
 {
     if (ws.isConnected()) {
         ws.disconnect();
-        if (xSemaphoreTake(statusMutex, pdMS_TO_TICKS(50)) == pdTRUE) {
-            cachedStatus = { "OFFLINE", 0, 0, 0 };
-            xSemaphoreGive(statusMutex);
-        }
+    }
+    if (xSemaphoreTake(statusMutex, pdMS_TO_TICKS(50)) == pdTRUE) {
+        cachedStatus = { "OFFLINE", 0, 0, 0 };
+        xSemaphoreGive(statusMutex);
     }
     wsRunning = false;
     //Serial.println("WS STOPPED");

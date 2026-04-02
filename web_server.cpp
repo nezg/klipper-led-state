@@ -1,7 +1,6 @@
 #include "web_server.h"
 #include <WebServer.h>
 #include <Preferences.h>
-//#include "printer_http.h"
 #include "printer_status.h"   
 #include "printer_moonraker.h"
 #include "web_pages.h"
@@ -69,17 +68,19 @@ static void handleRoot() {
   String print_color2 = prefGetString("color", "print_color2", "#000000");
   String pause_color = prefGetString("color", "pause_color", "#ffe438");
   String error_color = prefGetString("color", "error_color", "#fe1010");
-  String offline_color = prefGetString("color", "offline_color", "#fe1010");
+  String offline_color = prefGetString("color", "offline_color", "#101010");
   String complete_color = prefGetString("color", "complete_color", "#24ff5b");
 
-  uint8_t bed_temp_color_st = prefGetInt("effects", "bed_temp_c_st", 0);
-  uint8_t bed_temp_color_co = prefGetInt("effects", "bed_temp_c_co", 0);
-  uint8_t tempColorZonePercent = prefGetInt("effects", "t_color_zone", 10);
-  uint8_t print_center_start = prefGetInt("effects", "prt_center_st", 0);
-  uint8_t pause_wave_effect = prefGetInt("effects", "pause_wave_ef", 0);
-  uint8_t error_wave_effect = prefGetInt("effects", "error_wave_ef", 0);
-  uint8_t offline_wave_effect = prefGetInt("effects", "off_wave_ef", 0);
-  uint8_t complete_wave_effect = prefGetInt("effects", "compl_wave_ef", 0);
+  uint8_t  bed_temp_color_st = prefGetInt("effects", "bed_temp_c_st", 0);
+  uint8_t  bed_temp_color_co = prefGetInt("effects", "bed_temp_c_co", 0);
+  uint8_t  tempColorZonePercent = prefGetInt("effects", "t_color_zone", 10);
+  uint8_t  print_center_start = prefGetInt("effects", "prt_center_st", 0);
+  uint8_t  pause_wave_effect = prefGetInt("effects", "pause_wave_ef", 0);
+  uint8_t  error_wave_effect = prefGetInt("effects", "error_wave_ef", 0);
+  uint8_t  offline_wave_effect = prefGetInt("effects", "off_wave_ef", 0);
+  uint8_t  offline_rainbow = prefGetInt("effects", "off_rainbow", 1);
+  uint16_t rainbow_speed = prefGetInt16("effects", "rainbow_speed", 50);
+  uint8_t  complete_wave_effect = prefGetInt("effects", "compl_wave_ef", 0);
 
   uint16_t breath_period_ms = prefGetInt16("breath", "period_ms", 2000);
   uint8_t breath_amp_percent = prefGetInt("breath", "amp_percent", 50);
@@ -100,6 +101,8 @@ static void handleRoot() {
   pageMain.replace("{{pause_wave_effect_checked}}", (pause_wave_effect > 0) ? "checked" : "");
   pageMain.replace("{{error_wave_effect_checked}}", (error_wave_effect > 0) ? "checked" : "");
   pageMain.replace("{{offline_wave_effect_checked}}", (offline_wave_effect > 0) ? "checked" : "");
+  pageMain.replace("{{offline_rainbow_checked}}", (offline_rainbow > 0) ? "checked" : "");
+  pageMain.replace("{{rainbow_speed}}", String(rainbow_speed));
   pageMain.replace("{{complete_wave_effect_checked}}", (complete_wave_effect > 0) ? "checked" : "");
 
 
@@ -209,6 +212,8 @@ static void handleSaveColor() {
   uint8_t pause_wave_effect = server.hasArg("pause_wave_effect") ? 1 : 0;
   uint8_t error_wave_effect = server.hasArg("error_wave_effect") ? 1 : 0;
   uint8_t offline_wave_effect = server.hasArg("offline_wave_effect") ? 1 : 0;
+  uint8_t offline_rainbow = server.hasArg("offline_rainbow") ? 1 : 0;
+  uint16_t rainbow_speed = server.arg("rainbow_speed").toInt();
   uint8_t complete_wave_effect = server.hasArg("complete_wave_effect") ? 1 : 0;
 
   prefs.begin("color", false);
@@ -230,6 +235,8 @@ static void handleSaveColor() {
   prefs.putUChar("pause_wave_ef", pause_wave_effect);
   prefs.putUChar("error_wave_ef", error_wave_effect);
   prefs.putUChar("off_wave_ef", offline_wave_effect);
+  prefs.putUChar("off_rainbow", offline_rainbow); 
+  prefs.putUShort("rainbow_speed", rainbow_speed);
   prefs.putUChar("compl_wave_ef", complete_wave_effect);
   prefs.end();
 
