@@ -5,6 +5,17 @@
 The project works **out-of-the-box**, with **no changes required to the printer configuration**. All effects and LED control are processed on a **low-cost ESP32 board**, ensuring **minimal implementation cost**. Firmware receives printer status over **Wi-Fi** via **WebSocket** (supports Klipper/Moonraker).  
 
 ---
+## 📑 Table of Contents
+
+- [Preview](#preview)
+- [Supported Boards](#supported-boards)
+- [Features](#features)
+- [Assembly](#assembly)
+- [Firmware and Setup](#firmware-and-setup)
+- [Release Structure](#release-structure)
+- [Contribution](#contribution-and-improvements)
+- [License](#license)
+- [Русский перевод](#klipper-led-state-русский-перевод)
 
 # Preview 
 (All colors are configurable, its for example)
@@ -34,7 +45,7 @@ The project works **out-of-the-box**, with **no changes required to the printer 
 - **ESP32-C3**  
 - **ESP32-S3**  
 
-Firmware can be compiled in **Arduino IDE** for all supported boards.  
+Firmware can be compiled in **Arduino IDE** for all supported boards. 
 
 ---
 
@@ -50,9 +61,12 @@ Firmware can be compiled in **Arduino IDE** for all supported boards.
 - Displays:  
   - Current print status in two configurable colors with smooth gradient  
   - Bed temperature for **standby** and **complete** as a temperature scale on LED edges  
-  - Printer state with separate colors for **standby**, **pause**, **complete**, and **error/offline**  
+  - Printer state with separate colors for **standby**, **pause**, **complete**, **error** and **offline**  
 - Supports **OTA updates**  
-- No printer configuration editing required  
+- No printer configuration editing required
+- **Printer LED brightness tracking**
+  - Syncs the status bar brightness with the printer's own LED lighting
+  - If the printer backlight is turned off, the status bar will also turn off
 
 ---
 
