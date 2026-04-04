@@ -55,6 +55,43 @@ void loadPrinterConfig()
     printer_led[sizeof(printer_led) - 1] = '\0';
 }
 //===============================================================================
+static float parseExternalBrightness(JsonVariant obj)
+{
+    if (obj.isNull()) return -1.0f;
+
+    // 1. Предпочитаем scalar value
+    JsonVariant v = obj["value"];
+    if (!v.isNull()) {
+        float x = v.as<float>();
+        if (x < 0.0f) x = 0.0f;
+        if (x > 1.0f) x = 1.0f;
+        return x;
+    }
+
+    // 2. Иначе пробуем color_data
+    JsonVariant colorData = obj["color_data"];
+    if (!colorData.isNull()) {
+        JsonArray leds = colorData.as<JsonArray>();
+        if (!leds.isNull() && leds.size() > 0) {
+            JsonArray c = leds[0].as<JsonArray>();
+            if (!c.isNull() && c.size() > 0) {
+                float b = 0.0f;
+                for (JsonVariant ch : c) {
+                    if (!ch.isNull()) {
+                        float x = ch.as<float>();
+                        if (x > b) b = x;
+                    }
+                }
+                if (b < 0.0f) b = 0.0f;
+                if (b > 1.0f) b = 1.0f;
+                return b;
+            }
+        }
+    }
+
+    return -1.0f;
+}
+//===============================================================================
 static void updateCachedStatus(JsonObject status)
 {
     if (!statusMutex) return;
@@ -75,24 +112,7 @@ static void updateCachedStatus(JsonObject status)
 
         if (status.containsKey(printer_led))
         {
-            JsonVariant colorData = status[printer_led]["color_data"];
-
-            if (colorData.isNull())
-            {
-                // null
-                cachedStatus.ledState = -1.0f;
-            }
-            else
-            {
-                float r = colorData[0][0] | 0.0f;
-                float g = colorData[0][1] | 0.0f;
-                float b = colorData[0][2] | 0.0f;
-                float w = colorData[0][3] | 0.0f;
-
-                float m1 = (r > g) ? r : g;
-                float m2 = (b > w) ? b : w;
-                cachedStatus.ledState = (m1 > m2) ? m1 : m2;
-            }
+            cachedStatus.ledState = parseExternalBrightness(status[printer_led]);
         }
 
         cachedOnline = true;
@@ -153,7 +173,7 @@ static void wsEvent(WStype_t type, uint8_t * payload, size_t length)
                 "      \"display_status\": [\"progress\"],"
                 "      \"extruder\": [\"temperature\"],"
                 "      \"heater_bed\": [\"temperature\"],"
-                "      \"%s\": [\"color_data\"]"
+                "      \"%s\": [\"value\", \"color_data\"]"
                 "    }"
                 "  },"
                 "  \"id\": 2"
@@ -363,7 +383,7 @@ void printer_moonraker_requestUpdate()
         "\"display_status\":[\"progress\"],"
         "\"extruder\":[\"temperature\"],"
         "\"heater_bed\":[\"temperature\"],"
-        "\"%s\":[\"color_data\"]"
+        "\"%s\":[\"value\", \"color_data\"]"
         "}},\"id\":1}",
         printer_led
     );
