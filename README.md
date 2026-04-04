@@ -5,7 +5,7 @@
 The project works **out-of-the-box**, with **no changes required to the printer configuration**. All effects and LED control are processed on a **low-cost ESP32 board**, ensuring **minimal implementation cost**. Firmware receives printer status over **Wi-Fi** via **WebSocket** (supports Klipper/Moonraker).  
 
 ---
-## 📑 Table of Contents
+## Table of Contents
 
 - [Preview](#preview)
 - [Supported Boards](#supported-boards)
