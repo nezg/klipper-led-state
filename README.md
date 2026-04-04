@@ -4,6 +4,28 @@
 
 The project works **out-of-the-box**, with **no changes required to the printer configuration**. All effects and LED control are processed on a **low-cost ESP32 board**, ensuring **minimal implementation cost**. Firmware receives printer status over **Wi-Fi** via **WebSocket** (supports Klipper/Moonraker).  
 
+## Preview 
+(All colors are configurable, its for example)
+# Printing state
+![IMG_3492](https://github.com/user-attachments/assets/3c270585-6c4e-478c-a244-fd061f7ecfaf)
+
+# Standby state
+![IMG_3488](https://github.com/user-attachments/assets/7578929d-8003-4019-a3f5-36ac61d4fb73)
+
+# Pause state
+![IMG_3495](https://github.com/user-attachments/assets/4f7579ea-8b5b-4cea-a1a8-2257d5c2b643)
+
+# Error state
+![IMG_3496](https://github.com/user-attachments/assets/028b6648-4185-423f-89b1-00c5dc9d7acc)
+
+# Complete width bed temperature 
+![IMG_3494](https://github.com/user-attachments/assets/1d5a316d-5c82-4834-a339-62a90feafda3)
+
+# WebUI config page:
+<img width="754" height="1272" alt="IMG_3506" src="https://github.com/user-attachments/assets/3ada2ba3-f767-4a19-8fce-e8bd2ce29569" />
+
+
+
 ---
 
 ## Supported Boards
