@@ -35,7 +35,8 @@ The project works **out-of-the-box**, with **no changes required to the printer 
 ![IMG_3494](https://github.com/user-attachments/assets/1d5a316d-5c82-4834-a339-62a90feafda3)
 
 ## WebUI config page:
-<img width="754" height="1272" alt="IMG_3506" src="https://github.com/user-attachments/assets/3ada2ba3-f767-4a19-8fce-e8bd2ce29569" />
+<img width="601" height="1151" alt="image" src="https://github.com/user-attachments/assets/0c44428a-3736-41e0-a6cf-5990e714358c" />
+
 
 ---
 
