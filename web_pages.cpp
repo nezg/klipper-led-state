@@ -8,7 +8,7 @@ const char MAIN_PAGE_HEAD[] PROGMEM = R"rawliteral(
 <title>Printer State LED</title>
 <style>
   body { font-family: Arial, sans-serif; font-size: 14px; }
-  label { display:inline-block; width:150px; }
+  label { display:inline-block; width:180px; }
 </style>
 </head>
 <body>
@@ -26,6 +26,12 @@ async function updatePrinterStatus(){
         document.getElementById('progress').innerText = (d.progress*100).toFixed(1) + ' %';
         document.getElementById('nozzle').innerText = d.nozzle.toFixed(1) + ' °C';
         document.getElementById('bed').innerText = d.bed.toFixed(1) + ' °C';
+        const led_state = d.led_state*100;
+        if (led_state < 0) {
+          document.getElementById('led_state').innerText = "unset (set Klipper LED Confing String)";
+        } else {
+          document.getElementById('led_state').innerText = (d.led_state*100).toFixed(1)+ ' %';
+        }
     } catch(e) {
         console.error(e);
     }
@@ -53,6 +59,8 @@ window.addEventListener('DOMContentLoaded', () => {
 <label>Progress: </label><span id="progress">0 %</span><br><br>
 <label>Nozzle: </label><span id="nozzle">0 °C</span><br><br>
 <label>Bed: </label><span id="bed">0 °C</span><br><br>
+<label>LED Brightness: </label><span id="led_state">-</span><br><br>
+---------<br>
 <label>ESP CPU Core: </label><span id="cpu0">0 %</span> / <span id="cpu1">0 %</span><br>
 <hr>
 )rawliteral";
@@ -155,10 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <h2>Color Config:</h2>
 <form method="POST" action="/saveColor">
-  <label>Brightness:</label>
+  <label>Brightness (global):</label>
   <input type="range" min="0" max="100" 
          name="brightness" id="brightness" value="{{brightness}}">
-  <span id="brightness_value">{{brightness}} %</span>
+  <span id="brightness_value">{{brightness}} %</span>&nbsp;&nbsp;&nbsp;&nbsp;Modify brightness on printer led: <input type="checkbox" name="led_modify_brightness" id="led_modify_brightness" {{led_modify_brightness}}>
   <br>
   <label>Standby color:</label>
   <input type="color" style="width:50px;height:30px;border:none;" name="standby_color" id="standby_color" value="{{standby_color}}">
@@ -245,10 +253,12 @@ document.addEventListener('DOMContentLoaded', () => {
 )rawliteral";
 // ===================================================================================================================================================
 const char PRINTER_IP_PAGE[] PROGMEM = R"rawliteral(
-<h2><p style="color:red">Printer not responding</p></h2><br><hr>
 <h2>Printer Settings</h2>
 <form method="POST" action="/savePrint">
   <label>Printer IP: </label><input name="ip" id="printer_ip" value="{{IP}}"><br>
+  <br>
+  <label>Klipper LED Config String: </label><input name="klipper_led" id="klipper_led" value="{{klipper_led}}"><br>
+  <br>
   <input type="submit" value="Save">
 </form><br>
 <hr>

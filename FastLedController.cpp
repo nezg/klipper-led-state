@@ -310,6 +310,13 @@ void FastLedController::update(const PrinterStatus& status) {
   // ---- breath ----
   uint8_t breathFactor = calcBreathFactor(_breath_period_ms, _breath_amp);
 
+  // ---- led state modify
+  if ((_led_modify_brightness > 0) && (status.ledState >= 0.0f)) {
+    float s = status.ledState;
+    if (s > 1.0f) s = 1.0f;
+    breathFactor = scale8_video(breathFactor, (uint8_t)(s * 255.0f + 0.5f));
+  }
+
   // ---- progress ----
   bool useProgress =
     isPrinting && (status.progress >= 0.0f) && (status.progress <= 1.0f);
@@ -461,6 +468,7 @@ void FastLedController::loadConfig() {
   // color namespace
   prefs.begin("color", true);
   _brightness_percent = prefs.getUChar("brightness", 50);
+  _led_modify_brightness = prefs.getUChar("led_modify", 0);
   standbyColor = parseColor(prefs.getString("standby_color", "#FFFFFF"));
   printColor = parseColor(prefs.getString("print_color", "#529dff"));
   printColor2 = parseColor(prefs.getString("print_color2", "#000000"));

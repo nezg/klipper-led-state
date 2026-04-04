@@ -7,7 +7,7 @@
 extern Preferences prefs;
 #include "printer_status.h"
 
-void updatePrinterIP(const char* newIP);
+void updatePrinterIP(const char* newIP, const char* newLed);
 void loadPrinterConfig();
 
 bool checkPortAsync(const char* host, uint16_t port);

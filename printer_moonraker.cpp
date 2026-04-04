@@ -2,7 +2,7 @@
 
 static WebSocketsClient ws;
 
-static PrinterStatus cachedStatus = { "OFFLINE", 0, 0, 0 };
+static PrinterStatus cachedStatus = { "OFFLINE", 0, 0, 0, -1 };
 static bool cachedOnline = false;
 
 static uint32_t lastWsEvent = 0;
@@ -12,18 +12,23 @@ static bool itTimeoutRequest = false;
 static SemaphoreHandle_t statusMutex = NULL;
 
 char printer_ip[32] = {0};
+char printer_led[32] = {0};
 bool wsRunning = false;
 
 uint32_t moonrakerWatchdogTimer = 0;
 //===============================================================================
-void updatePrinterIP(const char* newIP)
+void updatePrinterIP(const char* newIP, const char* newLed)
 {
     prefs.begin("printer", false);
     prefs.putString("ip", newIP);
+    prefs.putString("klipper_led", newLed);
     prefs.end();
 
     strncpy(printer_ip, newIP, sizeof(printer_ip) - 1);
     printer_ip[sizeof(printer_ip) - 1] = '\0';
+
+    strncpy(printer_led, newLed, sizeof(printer_led) - 1);
+    printer_led[sizeof(printer_led) - 1] = '\0';
 
     printer_moonraker_stop();
 }
@@ -34,15 +39,20 @@ void loadPrinterConfig()
         statusMutex = xSemaphoreCreateMutex();
 
     prefs.begin("printer", true);
-
     String ip = prefs.getString("ip", "192.168.4.2");
+    String led = prefs.getString("klipper_led", "led LED0");
     prefs.end();
 
     if (ip.length() == 0)
         return;
+    if (led.length() == 0)
+        return;
 
     strncpy(printer_ip, ip.c_str(), sizeof(printer_ip) - 1);
     printer_ip[sizeof(printer_ip) - 1] = '\0';
+
+    strncpy(printer_led, led.c_str(), sizeof(printer_led) - 1);
+    printer_led[sizeof(printer_led) - 1] = '\0';
 }
 //===============================================================================
 static void updateCachedStatus(JsonObject status)
@@ -63,6 +73,28 @@ static void updateCachedStatus(JsonObject status)
         if (status.containsKey("heater_bed") && status["heater_bed"].containsKey("temperature"))
             cachedStatus.bedTemp = status["heater_bed"]["temperature"];
 
+        if (status.containsKey(printer_led))
+        {
+            JsonVariant colorData = status[printer_led]["color_data"];
+
+            if (colorData.isNull())
+            {
+                // null
+                cachedStatus.ledState = -1.0f;
+            }
+            else
+            {
+                float r = colorData[0][0] | 0.0f;
+                float g = colorData[0][1] | 0.0f;
+                float b = colorData[0][2] | 0.0f;
+                float w = colorData[0][3] | 0.0f;
+
+                float m1 = (r > g) ? r : g;
+                float m2 = (b > w) ? b : w;
+                cachedStatus.ledState = (m1 > m2) ? m1 : m2;
+            }
+        }
+
         cachedOnline = true;
         itTimeoutRequest = false;
 
@@ -71,6 +103,7 @@ static void updateCachedStatus(JsonObject status)
          //             cachedStatus.progress,
         //              cachedStatus.nozzleTemp,
         //              cachedStatus.bedTemp);
+        //              cachedStatus.pinState);
 
         xSemaphoreGive(statusMutex);
     }
@@ -109,20 +142,25 @@ static void wsEvent(WStype_t type, uint8_t * payload, size_t length)
         {
             //Serial.println("Moonraker WS connected");
 
-            const char* subscribeMsg =
-            "{"
-            "  \"jsonrpc\": \"2.0\","
-            "  \"method\": \"printer.objects.subscribe\","
-            "  \"params\": {"
-            "    \"objects\": {"
-            "      \"print_stats\": [\"state\"],"
-            "      \"display_status\": [\"progress\"],"
-            "      \"extruder\": [\"temperature\"],"
-            "      \"heater_bed\": [\"temperature\"]"
-            "    }"
-            "  },"
-            "  \"id\": 2"
-            "}";
+            char subscribeMsg[384];
+            snprintf(subscribeMsg, sizeof(subscribeMsg),
+                "{"
+                "  \"jsonrpc\": \"2.0\","
+                "  \"method\": \"printer.objects.subscribe\","
+                "  \"params\": {"
+                "    \"objects\": {"
+                "      \"print_stats\": [\"state\"],"
+                "      \"display_status\": [\"progress\"],"
+                "      \"extruder\": [\"temperature\"],"
+                "      \"heater_bed\": [\"temperature\"],"
+                "      \"%s\": [\"color_data\"]"
+                "    }"
+                "  },"
+                "  \"id\": 2"
+                "}",
+                printer_led
+            );
+
             ws.sendTXT(subscribeMsg);
 
             printer_moonraker_requestUpdate();
@@ -137,13 +175,13 @@ static void wsEvent(WStype_t type, uint8_t * payload, size_t length)
 
         case WStype_DISCONNECTED:
             cachedOnline = false;
-            //Serial.printf("WS disconnected, reason: %.*s\n", length, payload);
+            Serial.printf("WS disconnected, reason: %.*s\n", length, payload);
             printer_moonraker_stop();
             break;
 
         case WStype_ERROR:
             cachedOnline = false;
-            //Serial.printf("WS error: %.*s\n", length, payload);
+            Serial.printf("WS error: %.*s\n", length, payload);
             printer_moonraker_stop();
             break;
 
@@ -244,7 +282,7 @@ void printer_moonraker_stop()
         ws.disconnect();
     }
     if (xSemaphoreTake(statusMutex, pdMS_TO_TICKS(50)) == pdTRUE) {
-        cachedStatus = { "OFFLINE", 0, 0, 0 };
+        cachedStatus = { "OFFLINE", 0, 0, 0, -1 };
         xSemaphoreGive(statusMutex);
     }
     wsRunning = false;
@@ -317,13 +355,18 @@ void printer_moonraker_requestUpdate()
     if (!ws.isConnected()) {
         return;
     }
-    ws.sendTXT(
+    char req[384];
+    snprintf(req, sizeof(req),
         "{\"jsonrpc\":\"2.0\",\"method\":\"printer.objects.query\","
         "\"params\":{\"objects\":{"
-        "\"print_stats\": [\"state\"],"
-         "\"display_status\": [\"progress\"],"
-         "\"extruder\": [\"temperature\"],"
-         "\"heater_bed\": [\"temperature\"]"
-        "}},\"id\":1}"
+        "\"print_stats\":[\"state\"],"
+        "\"display_status\":[\"progress\"],"
+        "\"extruder\":[\"temperature\"],"
+        "\"heater_bed\":[\"temperature\"],"
+        "\"%s\":[\"color_data\"]"
+        "}},\"id\":1}",
+        printer_led
     );
+
+    ws.sendTXT(req);
 }

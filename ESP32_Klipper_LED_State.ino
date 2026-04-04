@@ -17,7 +17,7 @@ unsigned long lastUpdateLed = 0;
 
 void setup() {
   Serial.begin(115200);
-  delay(10);
+  delay(1000);
   //Serial.println("Setup start");
 
   wifi_init();

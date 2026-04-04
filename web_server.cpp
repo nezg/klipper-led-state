@@ -48,21 +48,12 @@ static void handleRoot() {
 
   PrinterStatus s;
   printer_moonraker_getCached(s);//printer_getCached(s);
-  bool online = printer_moonraker_isOnline();//printer_isOnline();
-
-  if (!online) {
-    String ip = prefGetString("printer", "ip", "192.168.4.1");
-
-    String pageIP = FPSTR(PRINTER_IP_PAGE);
-
-    pageIP.replace("{{IP}}", ip);
-    server.sendContent(pageIP);
-  }
   server.sendContent_P(MAIN_PAGE_STATE);
   // 2) STA режим — читаем IP и цвет из prefs
   String pageMain = FPSTR(MAIN_PAGE_COLORSET);
 
   uint8_t brightness = prefGetInt("color", "brightness", 50);
+  uint8_t led_modify_brightness = prefGetInt("color", "led_modify", 0);
   String standby_color = prefGetString("color", "standby_color", "#ffffff");
   String print_color = prefGetString("color", "print_color", "#529dff");
   String print_color2 = prefGetString("color", "print_color2", "#000000");
@@ -86,6 +77,7 @@ static void handleRoot() {
   uint8_t breath_amp_percent = prefGetInt("breath", "amp_percent", 50);
 
   pageMain.replace("{{brightness}}", String(brightness));
+  pageMain.replace("{{led_modify_brightness}}", (led_modify_brightness > 0) ? "checked" : "");
   pageMain.replace("{{standby_color}}", standby_color);
   pageMain.replace("{{print_color}}", print_color);
   pageMain.replace("{{print_color2}}", print_color2);
@@ -104,8 +96,7 @@ static void handleRoot() {
   pageMain.replace("{{offline_rainbow_checked}}", (offline_rainbow > 0) ? "checked" : "");
   pageMain.replace("{{rainbow_speed}}", String(rainbow_speed));
   pageMain.replace("{{complete_wave_effect_checked}}", (complete_wave_effect > 0) ? "checked" : "");
-
-
+  
   pageMain.replace("{{breath_period_ms}}", String(breath_period_ms));
   pageMain.replace("{{breath_amp_percent}}", String(breath_amp_percent));
   server.sendContent(pageMain);
@@ -133,6 +124,14 @@ static void handleRoot() {
   pageLED.replace("{{led_right_checked}}", (led_right > 0) ? "checked" : "");
   server.sendContent(pageLED);
 
+  String ip = prefGetString("printer", "ip", "192.168.4.1");
+  String klipper_led = prefGetString("printer", "klipper_led", "led LED0");
+
+  String pageIP = FPSTR(PRINTER_IP_PAGE);
+  pageIP.replace("{{IP}}", ip);
+  pageIP.replace("{{klipper_led}}", klipper_led);  
+  server.sendContent(pageIP);
+
   server.sendContent_P(WIFI_PAGE);
   server.sendContent_P(OTA_PAGE);
 
@@ -148,18 +147,19 @@ static void handleStatus() {
   bool online = printer_moonraker_isOnline();
   if (!online) {
     server.send(200, "application/json",
-                "{\"state\":\"OFFLINE\",\"progress\":0,\"nozzle\":0,\"bed\":0}");
+                "{\"state\":\"OFFLINE\",\"progress\":0,\"nozzle\":0,\"bed\":0,\"led_state\":0}");
     return;
   }
 
   char json[256];
   // progress хранится 0..1, но при выводе JS ожидает 0..1; на клиенте умножаем на 100
   snprintf(json, sizeof(json),
-           "{\"state\":\"%s\",\"progress\":%.3f,\"nozzle\":%.1f,\"bed\":%.1f}",
+           "{\"state\":\"%s\",\"progress\":%.3f,\"nozzle\":%.1f,\"bed\":%.1f,\"led_state\":%.3f}",
            s.state,
            s.progress,
            s.nozzleTemp,
-           s.bedTemp);
+           s.bedTemp,
+           s.ledState);
   server.send(200, "application/json", json);
 }
 // ================================================================================================
@@ -170,8 +170,9 @@ static void handleSavePrint() {
   }
 
   String ip = server.arg("ip");
+  String klipper_led = server.arg("klipper_led");
     
-  updatePrinterIP(ip.c_str());
+  updatePrinterIP(ip.c_str(), klipper_led.c_str());
   
 
   server.sendHeader("Location", "/", true);
@@ -197,6 +198,7 @@ static void handleSaveColor() {
   }
 
   uint8_t brightness = server.arg("brightness").toInt();
+  uint8_t led_modify_brightness = server.hasArg("led_modify_brightness") ? 1 : 0;
   String standby_color = server.arg("standby_color");
   String print_color = server.arg("print_color");
   String print_color2 = server.arg("print_color2");
@@ -218,6 +220,7 @@ static void handleSaveColor() {
 
   prefs.begin("color", false);
   prefs.putUChar("brightness", brightness);
+  prefs.putUChar("led_modify", led_modify_brightness);
   prefs.putString("standby_color", standby_color);
   prefs.putString("print_color", print_color);
   prefs.putString("print_color2", print_color2);
