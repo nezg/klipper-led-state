@@ -62,9 +62,12 @@ Firmware can be compiled in **Arduino IDE** for all supported boards.
 
 Minimum required components:  
 
-- **ESP32**, **ESP32-C3**, or **ESP32-S3** board  
-- Any 5V addressable LED strip (WS2812/NeoPixel compatible)  
-- Power supply for board and LED strip (5V, current depends on strip length, e.g., DC-DC 24V → 5V)  
+- **ESP32**, **ESP32-C3**, or **ESP32-S3** board
+  (esp32 c3 - https://ali.click/q0zu41d)
+- Any 5V addressable LED strip (WS2812/NeoPixel compatible)
+  (200led/m led strip - https://ali.click/wsyu41x)
+- Power supply for board and LED strip (5V, current depends on strip length, e.g., DC-DC 24V → 5V)
+  (dc dc 24 -> 5v https://ali.click/y4zu41s)
 - Connecting wires  
 
 ### Recommended components for stability
