@@ -13,6 +13,7 @@ static SemaphoreHandle_t statusMutex = NULL;
 
 char printer_ip[32] = {0};
 char printer_led[32] = {0};
+
 bool wsRunning = false;
 
 uint32_t moonrakerWatchdogTimer = 0;
@@ -59,7 +60,6 @@ static float parseExternalBrightness(JsonVariant obj)
 {
     if (obj.isNull()) return -1.0f;
 
-    // 1. Предпочитаем scalar value
     JsonVariant v = obj["value"];
     if (!v.isNull()) {
         float x = v.as<float>();
@@ -68,7 +68,6 @@ static float parseExternalBrightness(JsonVariant obj)
         return x;
     }
 
-    // 2. Иначе пробуем color_data
     JsonVariant colorData = obj["color_data"];
     if (!colorData.isNull()) {
         JsonArray leds = colorData.as<JsonArray>();
@@ -152,7 +151,28 @@ static void parseMoonraker(const char* payload, size_t length)
     }
 
 }
+//===============================================================================
+static void buildPrinterLedFragment(const char* printer_led, char* out, size_t outSize)
+{
+    if (!out || outSize == 0) return;
+    out[0] = '\0';
 
+    if (!printer_led || !printer_led[0]) return;
+
+    const char* field = nullptr;
+
+    if (strncmp(printer_led, "output_pin ", 11) == 0) {
+        field = "value";
+    } else if (strncmp(printer_led, "led ", 4) == 0 ||
+               strncmp(printer_led, "neopixel ", 9) == 0 ||
+               strncmp(printer_led, "dotstar ", 8) == 0) {
+        field = "color_data";
+    }
+
+    if (!field) return;
+
+    snprintf(out, outSize, ",\"%s\":[\"%s\"]", printer_led, field);
+}
 //===============================================================================
 static void wsEvent(WStype_t type, uint8_t * payload, size_t length)
 {
@@ -160,8 +180,9 @@ static void wsEvent(WStype_t type, uint8_t * payload, size_t length)
     {
         case WStype_CONNECTED:
         {
-            //Serial.println("Moonraker WS connected");
-
+            char ledFragment[64];
+            buildPrinterLedFragment(printer_led, ledFragment, sizeof(ledFragment));
+            
             char subscribeMsg[384];
             snprintf(subscribeMsg, sizeof(subscribeMsg),
                 "{"
@@ -172,13 +193,13 @@ static void wsEvent(WStype_t type, uint8_t * payload, size_t length)
                 "      \"print_stats\": [\"state\"],"
                 "      \"display_status\": [\"progress\"],"
                 "      \"extruder\": [\"temperature\"],"
-                "      \"heater_bed\": [\"temperature\"],"
-                "      \"%s\": [\"value\", \"color_data\"]"
+                "      \"heater_bed\": [\"temperature\"]"
+                "       %s"
                 "    }"
                 "  },"
                 "  \"id\": 2"
                 "}",
-                printer_led
+                ledFragment
             );
 
             ws.sendTXT(subscribeMsg);
@@ -375,6 +396,9 @@ void printer_moonraker_requestUpdate()
     if (!ws.isConnected()) {
         return;
     }
+    char ledFragment[64];
+    buildPrinterLedFragment(printer_led, ledFragment, sizeof(ledFragment));
+
     char req[384];
     snprintf(req, sizeof(req),
         "{\"jsonrpc\":\"2.0\",\"method\":\"printer.objects.query\","
@@ -382,10 +406,10 @@ void printer_moonraker_requestUpdate()
         "\"print_stats\":[\"state\"],"
         "\"display_status\":[\"progress\"],"
         "\"extruder\":[\"temperature\"],"
-        "\"heater_bed\":[\"temperature\"],"
-        "\"%s\":[\"value\", \"color_data\"]"
+        "\"heater_bed\":[\"temperature\"]"
+        "%s"
         "}},\"id\":1}",
-        printer_led
+        ledFragment
     );
 
     ws.sendTXT(req);
