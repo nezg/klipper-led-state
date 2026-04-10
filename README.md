@@ -1,3 +1,4 @@
+
 # Klipper LED State
 
 **Klipper LED State** is a simple project for creating a beautiful and customizable **LED status bar for a Klipper-controlled 3D printer**, inspired by H2D. It displays the printer status, print progress, bed temperature, and lighting effects such as **breath** and **wave**.
@@ -20,22 +21,24 @@ The project works **out-of-the-box**, with **no changes required to the printer 
 # Preview 
 (All colors are configurable, its for example)
 ## Printing state
-![IMG_3492](https://github.com/user-attachments/assets/3c270585-6c4e-478c-a244-fd061f7ecfaf)
+![photo_2026-04-11_02-10-00](https://github.com/user-attachments/assets/6513a523-4fa4-4918-9668-1a7467a0096d)
 
 ## Standby state
-![IMG_3488](https://github.com/user-attachments/assets/7578929d-8003-4019-a3f5-36ac61d4fb73)
+![photo_2026-04-11_02-10-25](https://github.com/user-attachments/assets/2f2e9f8f-368e-4108-a49b-a8986c1c1823)
 
 ## Pause state
-![IMG_3495](https://github.com/user-attachments/assets/4f7579ea-8b5b-4cea-a1a8-2257d5c2b643)
+![photo_2026-04-11_02-10-28](https://github.com/user-attachments/assets/c9941ec4-214f-493f-b8b2-9b4c13c270b0)
 
 ## Error state
-![IMG_3496](https://github.com/user-attachments/assets/028b6648-4185-423f-89b1-00c5dc9d7acc)
+![photo_2026-04-11_02-10-31](https://github.com/user-attachments/assets/d2cef058-07b4-4088-b9ac-4d3fb1d3bb2d)
 
 ## Complete width bed temperature 
-![IMG_3494](https://github.com/user-attachments/assets/1d5a316d-5c82-4834-a339-62a90feafda3)
+![photo_2026-04-11_02-10-34](https://github.com/user-attachments/assets/dd7ade62-00a4-4b6c-b3b5-9bbd8ee855b7)
+
 
 ## WebUI config page:
-<img width="610" height="1150" alt="image" src="https://github.com/user-attachments/assets/85c5f9d6-36c9-451e-a7ec-d74bc694294b" />
+![photo_2026-04-11_02-10-36](https://github.com/user-attachments/assets/ef9584bd-225f-41a0-926c-2703babbf3ed)
+
 
 
 
@@ -74,7 +77,7 @@ Firmware can be compiled in **Arduino IDE** for all supported boards.
 
 ## Assembly
 
-![IMG_3486](https://github.com/user-attachments/assets/7566c4d8-dec6-45f3-ad63-35cffe4d1a2c)
+![photo_2026-04-11_02-10-39](https://github.com/user-attachments/assets/e2e94dff-1d81-469c-ac4b-44d668779df3)
 
 **3D Model** for Infimech TX / Flyingbear S1: https://www.printables.com/model/1671783-progress-led-status-bar-for-infimech-tx-flyingbear
 
