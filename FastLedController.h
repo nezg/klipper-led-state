@@ -58,6 +58,7 @@ private:
 
   uint8_t _brightness_percent = 50;
   uint8_t _led_modify_brightness = 0;
+  uint8_t _led_modify_reverse = 0;
 
   CRGB standbyColor = CRGB::White;
   CRGB printColor = CRGB::Blue;

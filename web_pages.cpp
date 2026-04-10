@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
   <label>Brightness (global):</label>
   <input type="range" min="0" max="100" 
          name="brightness" id="brightness" value="{{brightness}}">
-  <span id="brightness_value">{{brightness}} %</span>&nbsp;&nbsp;&nbsp;&nbsp;Modify brightness on printer led: <input type="checkbox" name="led_modify_brightness" id="led_modify_brightness" {{led_modify_brightness}}>
+  <span id="brightness_value">{{brightness}} %</span>&nbsp;&nbsp;&nbsp;&nbsp;Modify brightness on printer led: <input type="checkbox" name="led_modify_brightness" id="led_modify_brightness" {{led_modify_brightness}}>&nbsp;&nbsp;Reverse: <input type="checkbox" name="led_modify_reverse" id="led_modify_reverse" {{led_modify_reverse}}>
   <br>
   <label>Standby color:</label>
   <input type="color" style="width:50px;height:30px;border:none;" name="standby_color" id="standby_color" value="{{standby_color}}">

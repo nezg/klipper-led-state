@@ -54,6 +54,7 @@ static void handleRoot() {
 
   uint8_t brightness = prefGetInt("color", "brightness", 50);
   uint8_t led_modify_brightness = prefGetInt("color", "led_modify", 0);
+  uint8_t led_modify_reverse = prefGetInt("color", "led_reverse", 0);
   String standby_color = prefGetString("color", "standby_color", "#ffffff");
   String print_color = prefGetString("color", "print_color", "#529dff");
   String print_color2 = prefGetString("color", "print_color2", "#000000");
@@ -78,6 +79,7 @@ static void handleRoot() {
 
   pageMain.replace("{{brightness}}", String(brightness));
   pageMain.replace("{{led_modify_brightness}}", (led_modify_brightness > 0) ? "checked" : "");
+  pageMain.replace("{{led_modify_reverse}}", (led_modify_reverse > 0) ? "checked" : "");
   pageMain.replace("{{standby_color}}", standby_color);
   pageMain.replace("{{print_color}}", print_color);
   pageMain.replace("{{print_color2}}", print_color2);
@@ -199,6 +201,7 @@ static void handleSaveColor() {
 
   uint8_t brightness = server.arg("brightness").toInt();
   uint8_t led_modify_brightness = server.hasArg("led_modify_brightness") ? 1 : 0;
+  uint8_t led_modify_reverse = server.hasArg("led_modify_reverse") ? 1 : 0;
   String standby_color = server.arg("standby_color");
   String print_color = server.arg("print_color");
   String print_color2 = server.arg("print_color2");
@@ -221,6 +224,7 @@ static void handleSaveColor() {
   prefs.begin("color", false);
   prefs.putUChar("brightness", brightness);
   prefs.putUChar("led_modify", led_modify_brightness);
+  prefs.putUChar("led_reverse", led_modify_reverse);
   prefs.putString("standby_color", standby_color);
   prefs.putString("print_color", print_color);
   prefs.putString("print_color2", print_color2);
