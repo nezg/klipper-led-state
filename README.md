@@ -76,6 +76,8 @@ Firmware can be compiled in **Arduino IDE** for all supported boards.
 
 ![IMG_3486](https://github.com/user-attachments/assets/7566c4d8-dec6-45f3-ad63-35cffe4d1a2c)
 
+3D Model for Infimech TX / Flyingbear S1: https://www.printables.com/model/1671783-progress-led-status-bar-for-infimech-tx-flyingbear
+
 Minimum required components:  
 
 - **ESP32**, **ESP32-C3**, or **ESP32-S3** board
